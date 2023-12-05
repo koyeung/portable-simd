@@ -1120,8 +1120,8 @@ where
     type Mask = isize;
 }
 
-const USE_BRANCH: bool = true;
-const USE_BITMASK: bool = false;
+const USE_BRANCH: bool = false;
+const USE_BITMASK: bool = true;
 
 #[inline]
 fn index<T, const N: usize>() -> Simd<T, N>
