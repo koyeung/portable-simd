@@ -406,6 +406,8 @@ where
         or: Self,
     ) -> Self {
         enable &= mask_up_to(enable, slice.len());
+        // SAFETY: We performed the bounds check by updating the mask. &[T] is properly aligned to
+        // the element.
         unsafe { Self::load_select_ptr(slice.as_ptr(), enable, or) }
     }
 
@@ -422,6 +424,7 @@ where
         or: Self,
     ) -> Self {
         let ptr = slice.as_ptr();
+        // SAFETY: The safety of reading elements from `slice` is ensured by the caller.
         unsafe { Self::load_select_ptr(ptr, enable, or) }
     }
 
@@ -437,6 +440,7 @@ where
         enable: Mask<<T as SimdElement>::Mask, N>,
         or: Self,
     ) -> Self {
+        // SAFETY: The safety of reading elements through `ptr` is ensured by the caller.
         unsafe { core::intrinsics::simd::simd_masked_load(enable.to_int(), ptr, or) }
     }
 
@@ -621,6 +625,8 @@ where
     #[inline]
     pub fn masked_store(self, slice: &mut [T], mut enable: Mask<<T as SimdElement>::Mask, N>) {
         enable &= mask_up_to(enable, slice.len());
+        // SAFETY: We performed the bounds check by updating the mask. &[T] is properly aligned to
+        // the element.
         unsafe { self.masked_store_ptr(slice.as_mut_ptr(), enable) }
     }
 
@@ -631,11 +637,13 @@ where
         enable: Mask<<T as SimdElement>::Mask, N>,
     ) {
         let ptr = slice.as_mut_ptr();
+        // SAFETY: The safety of writing elements in `slice` is ensured by the caller.
         unsafe { self.masked_store_ptr(ptr, enable) }
     }
 
     #[inline]
     pub unsafe fn masked_store_ptr(self, ptr: *mut T, enable: Mask<<T as SimdElement>::Mask, N>) {
+        // SAFETY: The safety of writing elements through `ptr` is ensured by the caller.
         unsafe { core::intrinsics::simd::simd_masked_store(enable.to_int(), ptr, self) }
     }
 
