@@ -261,6 +261,7 @@ where
     /// # Panics
     ///
     /// Panics if the slice's length is less than the vector's `Simd::N`.
+    /// Use `load_or_default` for an alternative that does not panic.
     ///
     /// # Example
     ///
