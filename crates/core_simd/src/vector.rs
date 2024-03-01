@@ -405,7 +405,7 @@ where
         mut enable: Mask<<T as SimdElement>::Mask, N>,
         or: Self,
     ) -> Self {
-        enable &= mask_up_to(enable, slice.len());
+        enable &= mask_up_to(slice.len());
         // SAFETY: We performed the bounds check by updating the mask. &[T] is properly aligned to
         // the element.
         unsafe { Self::load_select_ptr(slice.as_ptr(), enable, or) }
@@ -624,7 +624,7 @@ where
 
     #[inline]
     pub fn masked_store(self, slice: &mut [T], mut enable: Mask<<T as SimdElement>::Mask, N>) {
-        enable &= mask_up_to(enable, slice.len());
+        enable &= mask_up_to(slice.len());
         // SAFETY: We performed the bounds check by updating the mask. &[T] is properly aligned to
         // the element.
         unsafe { self.masked_store_ptr(slice.as_mut_ptr(), enable) }
@@ -1149,12 +1149,12 @@ where
 }
 
 #[inline]
-fn mask_up_to<M, const N: usize>(enable: Mask<M, N>, len: usize) -> Mask<M, N>
+fn mask_up_to<M, const N: usize>(len: usize) -> Mask<M, N>
 where
     LaneCount<N>: SupportedLaneCount,
     M: MaskElement,
 {
     let index = lane_indices::<i8, N>();
     let lt = index.simd_lt(Simd::splat(i8::try_from(len).unwrap_or(i8::MAX)));
-    enable & Mask::<M, N>::from_bitmask_vector(lt.to_bitmask_vector())
+    Mask::<M, N>::from_bitmask_vector(lt.to_bitmask_vector())
 }
