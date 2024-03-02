@@ -1136,7 +1136,7 @@ where
 }
 
 #[inline]
-fn lane_indices<T, const N: usize>() -> Simd<T, N>
+fn _lane_indices<T, const N: usize>() -> Simd<T, N>
 where
     T: MaskElement + Default + core::convert::From<i8> + core::ops::Add<T, Output = T>,
     LaneCount<N>: SupportedLaneCount,
@@ -1154,7 +1154,8 @@ where
     LaneCount<N>: SupportedLaneCount,
     M: MaskElement,
 {
-    let index = lane_indices::<i8, N>();
-    let lt = index.simd_lt(Simd::splat(i8::try_from(len).unwrap_or(i8::MAX)));
-    Mask::<M, N>::from_bitmask_vector(lt.to_bitmask_vector())
+    // let index = lane_indices::<i8, N>();
+    // let lt = index.simd_lt(Simd::splat(i8::try_from(len).unwrap_or(i8::MAX)));
+    // Mask::<M, N>::from_bitmask_vector(lt.to_bitmask_vector())
+    Mask::<M, N>::from_bitmask((1_u64 << len) - 1)
 }
