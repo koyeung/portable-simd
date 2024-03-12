@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - master
-      - feature/trytry
+      - feature/trytry2
 
 env:
   CARGO_NET_RETRY: 10
