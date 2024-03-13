@@ -1225,11 +1225,32 @@ where
 }
 
 #[inline]
+fn _mask_up_to_v2<M, const N: usize>(len: usize) -> Mask<M, N>
+where
+    LaneCount<N>: SupportedLaneCount,
+    M: MaskElement,
+{
+    let index = lane_indices::<N>();
+    index.simd_lt(Simd::splat(len)).cast()
+}
+
+#[inline]
 fn mask_up_to<M, const N: usize>(len: usize) -> Mask<M, N>
 where
     LaneCount<N>: SupportedLaneCount,
     M: MaskElement,
 {
     let index = lane_indices::<N>();
+    macro_rules! case {
+        ($ty:ty) => {
+            if N < <$ty>::MAX as usize {
+                return index.cast().simd_lt(Simd::splat(len.min(N) as $ty)).cast();
+            }
+        };
+    }
+    case!(u8);
+    case!(u16);
+    case!(u32);
+    case!(u64);
     index.simd_lt(Simd::splat(len)).cast()
 }
